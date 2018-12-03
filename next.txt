@@ -1,0 +1,26 @@
+Further Initialization:
+- mapState + second floor
+- mapState + third floor
+- Items
+- Actions
+- mapState + water level
+
+Advanced Initialization:
+- mapState + cave level
+- monsters + combat system
+
+Basic IO:
+- Elevate functions
+- Examine functions
+- Help functions
+
+Further IO:
+- Use, Put, etc. functions
+
+Advanced IO:
+- Attack functions
+
+Anytime Additions:
+- Intro
+- Better writing
+- Storytelling
