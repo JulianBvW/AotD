@@ -3,7 +3,7 @@ import System.Directory
 import qualified Data.Map as Map
 
 data Direction = North | East | South | West deriving (Show, Eq, Ord)
-data Location = L1 | L2 | L3 | L4 | L5 | L6 deriving (Show, Eq)
+data Location = L1 | L2 | L3 | L4 | L5 | L6 | L7 deriving (Show, Eq)
 data Item = Stick | Torch deriving (Show, Eq, Ord)
 data RoomData = RoomData {items :: [Item], directions :: Map.Map Direction Location} deriving Show
 type MapState = Map.Map Location RoomData
@@ -11,6 +11,7 @@ type MapState = Map.Map Location RoomData
 mapState = []
 
 main = do
+    printLogoFull
     putStrLn "<< Start >>"
     gameLoop
 
