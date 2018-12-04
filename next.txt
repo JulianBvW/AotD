@@ -1,6 +1,4 @@
 Further Initialization:
-- mapState + second floor
-- mapState + third floor
 - Items
 - Actions
 - mapState + water level
@@ -10,7 +8,6 @@ Advanced Initialization:
 - monsters + combat system
 
 Basic IO:
-- Elevate functions
 - Examine functions
 - Help functions
 
