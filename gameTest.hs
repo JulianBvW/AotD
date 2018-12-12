@@ -26,8 +26,7 @@ introLoop gameState = do
 
 gameLoop (mapState, playerState) = do
     putStr $ "You are currently in " ++ (show $ snd playerState) ++ "\n\n> "
-    finput <- getLine
-    let input = map toLower . unwords $ words finput
+    input <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
     if quitChars input
         then return ()
         else gameLoop $ newState input (mapState, playerState)
