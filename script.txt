@@ -1,0 +1,196 @@
+Help:
+:help, :quit, :save, :load
+attack {Creature} with {Object}
+craft {Object} 
+dance to {Song}
+drop {Object}
+examine [me, {Object}]
+get up
+go [north, east, south, west, up, down]; [n, e, s, w, u, d]
+look around, look [in, through] {Object}
+push {Object}, move {Object}
+put {Object} [on, in] {Object}
+take {Object}
+use {Object}, use {Object} on {Object}
+
+-- floor_0 --
+
+> :help
+\show help
+
+> look around
+You find yourself lying down on a pink pillow in a slightly lit up rectangular room. 
+Each of the four walls containing a door with signs above them.
+From the ceiling a large metal pipe with some blood on it is hanging down.
+
+There is a flashlight.
+
+> examine me
+You notice deep wounds all over your body.
+On your lap there is a small voice messanger containing a recorded message addressed to you. 
+
+> take messanger 
+
+> examine pillow
+You thought it was pink but actually it is your own blood.
+
+> get up 
+\if done_immediately: You stood up.
+\else: You actually succeeded in standing up!
+
+\if !pickUp_note: A small voice messanger fell to the ground.
+
+> examine message
+Message one: "Hey there. Here is Micheal .. your former engineering supervisor .. I found your seemingly lifeless body after the accident that caused us to jump to the wrong location.   
+The ship seems to have colided with another planet.
+As far as I know everybody else is dead .. we are the last survivors ..
+I will do my best to keep you alive and safe so let's hope for the best!"
+*Message ended*
+
+Message two: "OK .. you have been asleep for the last two hours and unfortunately there is a problem that is comming from the engine room.
+To fix it I have to go out and gather materials but I'll be back as fast as I can.  
+Because without restoring the power of our energy cells we have no way of using the ships transmission tower to contact the Federation."
+*Message ended*
+
+> e
+The door is locked .. 
+Enter Code:
+\if code_correct: \goto machine_room 
+
+> s
+The door is locked ..
+Enter Code:
+\if code_correct: \goto terminal_room 
+
+> n
+\goto elevator_room
+
+> w
+\goto panorama_room_w
+
+-- panorama_room_w --
+
+> look around
+The room has a big panorama window on the western wall. 
+The others each contain a door with signs above them.
+
+> look through window 
+Shockingly you stare into the deep void surrounding you ... there is nothing else to see than water .. The ship has to be trapped under the sea!
+
+> n
+The door is locked ..
+Enter code:
+\if code_correct: \goto sience_lab
+
+> e
+\goto floor_0
+
+> s
+\goto airlock_lobby
+
+-- elevator_room_0 --
+
+> look around
+On the northern wall there is an elevator that only can go up.
+Again the other walls each have a door also having signs above them.
+
+> e
+The door is locked ..
+Enter Code:
+\if code_correct: \goto chiefs_room
+
+> s
+\goto floor_0
+
+> w 
+the door is locked ..
+Enter Code:
+\if code_correct: \goto science_lab
+
+> u
+\goto elvator_room_1
+
+-- airlock_lobby --
+
+> look around
+The are doors on the north, east and western walls that have signs above them.
+
+> n e s w ...
+
+-- elevator_room_1 -- 
+
+> look around 
+This time there are doors in the east and south again with signs above them.
+Also the elevator can go up and down now.
+
+> n e s w ...
+
+-- panorama_room_e --
+
+> look around 
+There is the door to the west where you just came through and a big panorama window to the east.
+\if locker-moved: There is a hole in the floor where you can go down.
+\else: There is a locker in the middle of the room that appears to have been fallen down.
+
+> look through window 
+There is just black nothingness .. seems to be rocks.
+
+-- floor_1n --
+
+> look around 
+There are doors to the north and west each labeled with a sign above.
+ 
+-- floor_1s--
+
+> look around
+There are three doors .. one to the north one to the east and another to the west.
+They all have signs above.
+
+-- elevator_room_2 --
+
+> look around
+As you are currently on the highest level the elevator now only can go down
+Also there is one door to the south with a sign above it.
+
+-- chiefs_room --
+
+> look around
+There is a door to the west. 
+In the middle of the room there is the dead body of the security chief laying on the ground
+
+> examine body 
+You find a small blacklight in the pockets of his jacket.
+
+> use blacklight
+The special shine of your blacklight reviels a code printed on the arm of the security chief.
+It says: 4546B
+
+-- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
