@@ -3,22 +3,22 @@ import Control.Concurrent
 
 printLogo = do
     clearScreen
-    threadDelay 2000000
+    wait 20
     putStrLn "\n\n        _      _             _                "
     putStrLn "       /_\\  __| |_ _____ _ _| |_ _  _ _ _ ___ ___"
     putStrLn "      / _ \\/ _` \\ V / -_) ' \\  _| || | '_/ -_|_-<"
     putStrLn "     /_/ \\_\\__,_|\\_/\\___|_||_\\__|\\_,_|_| \\___/__/\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-    threadDelay 500000
+    wait 5
     putStrLn "\n\n        _      _             _                          __"
     putStrLn "       /_\\  __| |_ _____ _ _| |_ _  _ _ _ ___ ___  ___ / _|"
     putStrLn "      / _ \\/ _` \\ V / -_) ' \\  _| || | '_/ -_|_-< / _ \\  _|"
     putStrLn "     /_/ \\_\\__,_|\\_/\\___|_||_\\__|\\_,_|_| \\___/__/ \\___/_|\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-    threadDelay 500000
+    wait 5
     putStrLn "\n\n        _      _             _                          __   _   _        "
     putStrLn "       /_\\  __| |_ _____ _ _| |_ _  _ _ _ ___ ___  ___ / _| | |_| |_  ___ "
     putStrLn "      / _ \\/ _` \\ V / -_) ' \\  _| || | '_/ -_|_-< / _ \\  _| |  _| ' \\/ -_)"
     putStrLn "     /_/ \\_\\__,_|\\_/\\___|_||_\\__|\\_,_|_| \\___/__/ \\___/_|    \\__|_||_\\___|\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-    threadDelay 1000000
+    wait 10
     putStrLn "\n\n        _      _             _                          __   _   _        "
     putStrLn "       /_\\  __| |_ _____ _ _| |_ _  _ _ _ ___ ___  ___ / _| | |_| |_  ___ "
     putStrLn "      / _ \\/ _` \\ V / -_) ' \\  _| || | '_/ -_|_-< / _ \\  _| |  _| ' \\/ -_)"
@@ -32,7 +32,7 @@ printLogo = do
     putStrLn "     | __|_  | | _ \\__ \\ _   | |) || |(_-</ _|/ _ \\\\ V / / -_) | '_|| || | "
     putStrLn "     |_| (_) |_|(_)|___/(_)  |___/ |_|/__/\\__|\\___/ \\_/  \\___| |_|   \\_, | "
     putStrLn "                                                                     |__/  \n\n\n\n\n\n"
-    threadDelay 2500000
+    wait 25
     putStrLn "\n\n        _      _             _                          __   _   _        "
     putStrLn "       /_\\  __| |_ _____ _ _| |_ _  _ _ _ ___ ___  ___ / _| | |_| |_  ___ "
     putStrLn "      / _ \\/ _` \\ V / -_) ' \\  _| || | '_/ -_|_-< / _ \\  _| |  _| ' \\/ -_)"
@@ -65,3 +65,4 @@ printLogo = do
 -- ### Help Functions ###
 
 clearScreen = putStr "\ESC[2J"
+wait a = threadDelay $ a * 10--0000
