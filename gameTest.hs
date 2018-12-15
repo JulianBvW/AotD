@@ -6,12 +6,12 @@ import qualified Data.Map as Map
 import qualified Logo as Logo
 import qualified Intro as Intro
 
-data Direction  = North | East | South | West deriving (Show, Eq, Ord, Read)
-data Location   = Empty | Floor0 | ElevatorRoom0 | ChiefsRoom | MachineRoom | SnakeFarm | TerminalRoom | Laboratory | PanoramaRoomW | PreperationRoom | AirlockRoom | ElevatorRoom1 | PanoramaRoomE | Floor1N | Floor1S | IncubationRoom | StockRoom | Floor1E | ElevatorRoom2 | TransmissionRoom deriving (Show, Eq, Ord, Read)
-data Item       = Item1 | Item2 deriving (Show, Eq, Ord, Read)
-data Action     = ElevUp Location | ElevDown Location | JumpDown Location Bool deriving (Show, Eq, Ord, Read)
-data RoomData   = RoomData {directions :: Map.Map Direction DoorOpen, items :: [Item], actions :: [Action]} deriving (Show, Eq, Ord, Read)
-data PlayerData = PlayerData {inventory :: [Item], health :: Int, maxHealth :: Int, movesTilWaterDeath :: Int, movesTilReactorDeath :: Int, getName :: String} deriving (Show, Eq, Ord, Read)
+data Direction   = North | East | South | West deriving (Show, Eq, Ord, Read)
+data Location    = Empty | Floor0 | ElevatorRoom0 | ChiefsRoom | MachineRoom | SnakeFarm | TerminalRoom | Laboratory | PanoramaRoomW | PreperationRoom | AirlockRoom | ElevatorRoom1 | PanoramaRoomE | Floor1N | Floor1S | IncubationRoom | StockRoom | Floor1E | ElevatorRoom2 | TransmissionRoom deriving (Show, Eq, Ord, Read)
+data Item        = Item1 | Item2 deriving (Show, Eq, Ord, Read)
+data Action      = ElevUp Location | ElevDown Location | JumpDown Location Bool deriving (Show, Eq, Ord, Read)
+data RoomData    = RoomData {directions :: Map.Map Direction DoorOpen, items :: [Item], actions :: [Action]} deriving (Show, Eq, Ord, Read)
+data PlayerData  = PlayerData {inventory :: [Item], health :: Int, maxHealth :: Int, movesTilWaterDeath :: Int, movesTilReactorDeath :: Int, getName :: String, gameOver :: Bool} deriving (Show, Eq, Ord, Read)
 
 type DoorOpen    = (Location, Bool)
 type MapState    = Map.Map Location RoomData
@@ -30,9 +30,13 @@ gameLoop (mapState, playerState) = do
     putStr $ "You are currently in " ++ (show $ snd playerState) ++ "\n\n> "
     input <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
     let newGameState = newState input (mapState, playerState)
-    if quitChars input
-        then return ()
-        else gameLoop newGameState
+    if gameOver $ fst playerState
+        then endGame "GameOver"
+        else if quitChars input
+                 then endGame "UserQuit"
+                 else gameLoop newGameState
+
+endGame a = putStrLn $ "\n\n" ++ a
 
 -- ### Interaction ###
 
@@ -90,7 +94,7 @@ initialmS = Map.fromList
      (Floor1E,          RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Empty, False)),           (South, (Empty, False)),            (West, (Floor1S, False))],         items = [], actions = [JumpDown SnakeFarm False]}),
      (ElevatorRoom2,    RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Empty, False)),           (South, (TransmissionRoom, False)), (West, (Empty, False))],           items = [], actions = [ElevDown ElevatorRoom1]}),
      (TransmissionRoom, RoomData {directions = Map.fromList [(North, (ElevatorRoom2, False)), (East, (Empty, False)),           (South, (Empty, False)),            (West, (Empty, False))],           items = [], actions = []})]
-initialpS name = (PlayerData {inventory = [], health = 20, maxHealth = 20, movesTilWaterDeath = -1, movesTilReactorDeath = -1, getName = name}, Floor0)
+initialpS name = (PlayerData {inventory = [], health = 20, maxHealth = 20, movesTilWaterDeath = -1, movesTilReactorDeath = -1, getName = name, gameOver = False}, Floor0)
 
 
 

@@ -1,7 +1,6 @@
 Further Initialization:
 - Items
 - Actions
-- mapState + cave level
 
 Advanced Initialization:
 - monsters + combat system
@@ -17,6 +16,7 @@ Advanced IO:
 - Attack functions
 
 Anytime Additions:
+- Menu
 - mapState + water level
 - Better writing
 - Storytelling
