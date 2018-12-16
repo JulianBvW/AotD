@@ -8,7 +8,7 @@ examine [me, {Object}]
 get up
 go [north, east, south, west, up, down]; [n, e, s, w, u, d]
 look around, look [in, through] {Object}
-push {Object}, move {Object}
+push {Object}
 put {Object} [on, in] {Object}
 take {Object}
 use {Object}, use {Object} on {Object}

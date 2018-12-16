@@ -1,23 +1,10 @@
 Further Initialization:
-- Items
-- Actions
-
-Advanced Initialization:
-- implement dungeon
 - monsters + combat system
-
-Basic IO:
-- Examine functions
-- Help functions
-
-Further IO:
-- Use, Put, etc. functions
 
 Advanced IO:
 - Attack functions
 
 Anytime Additions:
-- Menu
 - mapState + water level
 - Better writing
 - Storytelling

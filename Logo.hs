@@ -65,4 +65,4 @@ printLogo = do
 -- ### Help Functions ###
 
 clearScreen = putStr "\ESC[2J"
-wait a = threadDelay $ a * 10--0000
+wait a = threadDelay $ a * 100000

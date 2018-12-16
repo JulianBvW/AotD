@@ -1,4 +1,4 @@
-module Menu (main) where
+module Menu (loop) where
 
 main = do
     putStrLn "\n"
@@ -14,6 +14,11 @@ main = do
     putStrLn "                                                                  |___|\n\n"
     putStrLn "                              [1] New Game\n"
     putStrLn "                              [2] Load Game\n"
-    putStrLn "                              [3] Settings\n\n\n\n"
-    number <- getLine
-    return number
+    putStr "                              [3] Settings\n\n\n\n\n> "
+    getLine
+
+loop = do
+    choice <- main
+    if elem choice ["1", "2"]
+        then return choice
+        else loop

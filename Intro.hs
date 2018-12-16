@@ -51,16 +51,15 @@ playIntro = do
     p " Hurry up!\"\n"
     wait 10
     p "Together with Quill you both run out of the Machine Room to get the\nrepair parts."
-    p "After you two split up the ship starts to shake and you fall to the ground\nwhile hearing Quill shrieking from another room."
+    p "Right after you two split up the ship starts to shake and you fall to the ground\nwhile hearing Quill shrieking from another room."
     p "You decide to finish your task first before looking after him.\n"
     wait 15
-    p $ "With the " ++ (item number) ++ " in your pocket you\nhurry back to the Machine Room."
-    p "But before you can get into the room, the door closes immediately."
-    p "The only thing you saw was a brigth red light and the scarred\nfaces of you colleagues.\n"
+    p "But before you got up, you hear the Machine Room door closing behind you."
+    p "Immedietly you turn around just to see a brigth red light and the scarred\nfaces of you colleagues disappearing behind the door.\n"
     wait 12
-    p "Suddenly you get pushed to a wall by the rapidly accelerating\nshipt as if it where to jump into hyperspace."
+    p "Suddenly you get pushed to a wall by the rapidly accelerating\nship as if it where to jump into hyperspace."
     p "The ship starts to shake again. A small pipe crashes from the ceiling and is\ncomming directly at your face."
-    p "Suddenly everything is black." 
+    p "And then everything is black." 
     p "..."
     p "         [Enter]"
     getLine
@@ -69,8 +68,8 @@ playIntro = do
 -- ### Help Functions ###
 
 clearScreen = putStr "\ESC[2J"
-p a = putStrLn a
-wait a = threadDelay $ a * 1000000
+p text = putStrLn text -- Kuerzere Schreibweise
+wait seconds = threadDelay $ seconds * 1000000
 
 getName = do
     name <- getLine
@@ -79,7 +78,3 @@ getName = do
         else do
             putStr $ "\n\"[Mechanical Voice] Could not identify. Repeat.\"\n\n> "
             getName
-
-item number
-    | number == Just "2" = "Long Field Communication Module"
-    | otherwise          = "Universal Compression Unit"
