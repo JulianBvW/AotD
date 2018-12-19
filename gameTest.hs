@@ -12,7 +12,13 @@ import qualified Menu as Menu
 import qualified RandomDungeon as Dungeon
 
 data Direction   = North | East | South | West deriving (Show, Eq, Ord, Read)
-data Location    = Empty | Floor0 | ElevatorRoom0 | ChiefsRoom | MachineRoom | SnakeFarm | TerminalRoom | Laboratory | PanoramaRoomW | PreperationRoom | AirlockRoom | ElevatorRoom1 | PanoramaRoomE | Floor1N | Floor1S | IncubationRoom | StockRoom | Floor1E | ElevatorRoom2 | TransmissionRoom | Cave deriving (Show, Eq, Ord, Read, Enum)
+data Location    = Empty | Floor0 | ElevatorRoom0 | ChiefsRoom
+                   | MachineRoom | SnakeFarm | TerminalRoom | Laboratory
+                   | PanoramaRoomW | PreperationRoom | AirlockRoom
+                   | ElevatorRoom1 | PanoramaRoomE | Floor1N | Floor1S
+                   | IncubationRoom | StockRoom | Floor1E
+                   | ElevatorRoom2 | TransmissionRoom
+                   | Cave deriving (Show, Eq, Ord, Read, Enum)
 data Item        = ChiefsID | LFCM | UCU | VoiceMSG deriving (Show, Eq, Ord, Read, Enum)
 data Action      = ElevUp Location | ElevDown Location | JumpDown Location Bool | Disc deriving (Show, Eq, Ord, Read)
 data RoomData    = RoomData {directions :: Map.Map Direction DoorStatus, items :: [Item], actions :: [Action]} deriving (Show, Eq, Ord, Read)
@@ -36,12 +42,14 @@ main' = do
                      filePath <- getLine
                      readFile filePath
                  else do -- User wants to start a new game
-                     name <- Intro.playIntro
+                     --name <- Intro.playIntro
+                     let name = "Debugger"
                      return $ show ((Texts.wakeUp, (initialmS, initialpS name)), randomDungeon))
     let (gameState, dungeon) = read game :: (GameState, ([((Integer, Integer), Dungeon.Room)], (Integer, Integer)))
-    --Dungeon.printDungeon $ fst dungeon       -- <- Debugging
-    --putStrLn . show $ snd dungeon            -- <- Debugging
+    Dungeon.printDungeon $ fst dungeon       -- <- Debugging
+    putStrLn . show $ snd dungeon            -- <- Debugging
     Logo.printLogo
+    if choice == "2" then putStrLn "\n\n" else return ()
     gameLoop gameState dungeon
 
 gameLoop (msg, (mapState, playerState)) dungeon = do
@@ -54,18 +62,18 @@ gameLoop (msg, (mapState, playerState)) dungeon = do
     input <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
     let newGameState = newState input (mapState', playerState)
     if (gameOver $ fst playerState) == 1
-        then endGame "GameOver"
-        else if (gameOver $ fst playerState) == 2
-                 then endGame "YouWon"
-                 else if quitChars input
-                          then endGame "UserQuit"
-                          else if saveChars input
-                                   then do
-                                       putStr "Save File: "
-                                       filePath <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
-                                       writeFile filePath (show ((msg, (mapState, playerState)), dungeon))
-                                       gameLoop ("Saved.\n" ++ msg, snd newGameState) dungeon
-                                   else gameLoop newGameState dungeon
+     then endGame Texts.gameOver
+     else if (gameOver $ fst playerState) == 2
+           then endGame Texts.gameWon
+           else if quitChars input
+                 then endGame "UserQuit"
+                 else if saveChars input
+                       then do
+                           putStr "Save File: "
+                           filePath <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
+                           writeFile filePath (show ((msg, (mapState, playerState)), dungeon))
+                           gameLoop ("Saved.\n" ++ msg, snd newGameState) dungeon
+                       else gameLoop newGameState dungeon
 
 endGame a = putStrLn $ "\n\n" ++ a
 
@@ -198,9 +206,9 @@ putIn input (mS, pS)
     | elem input ["lfcm in transmission tower", "lfcm in tower", "long field communication module in transmission tower", "long field communication module in tower"] =
         if snd pS == TransmissionRoom
             then (if elem LFCM (getInventory pS)
-                      then (Texts.wonGame, (mS, (PlayerData {inventory = getInventory pS, health = health $ fst pS, maxHealth = maxHealth $ fst pS, movesTilWaterDeath = movesTilWaterDeath $ fst pS, movesTilReactorDeath = movesTilReactorDeath $ fst pS, getName = getName $ fst pS, gameOver = 2}, snd pS)))
+                      then (Texts.gameWon, (mS, (PlayerData {inventory = getInventory pS, health = health $ fst pS, maxHealth = maxHealth $ fst pS, movesTilWaterDeath = movesTilWaterDeath $ fst pS, movesTilReactorDeath = movesTilReactorDeath $ fst pS, getName = getName $ fst pS, gameOver = 2}, snd pS)))
                       else ("You have no Long Field Communication Module in your inventory.", (mS, pS)))
-            else ("You aren't in the rigth room.", (mS, pS))
+            else ("You aren't in the right room.", (mS, pS))
     | otherwise = ("What are you trying to accomplish with that?", (mS, pS))
 
 testCode mS "Input locker code (lockernr. I):" = do
@@ -218,7 +226,7 @@ testCode mS "Input locker code (lockernr. III):" = do
     input <- (getLine >>= (\x -> return (unwords $ words x)))
     if input == "4761"
         then do
-            putStrLn Texts.rigthLockerCode
+            putStrLn Texts.rightLockerCode
             return (addMapItem mS StockRoom LFCM)
         else do
             putStrLn "Wrong code."
@@ -233,7 +241,7 @@ testCode mS "Input security door code:" = do
     input <- (getLine >>= (\x -> return (unwords $ words x)))
     if input == "4546B"
         then do
-            putStrLn Texts.tRoomDoorOpen
+            putStrLn Texts.righttRoomCode
             return (changeDoorState (changeDoorState mS TransmissionRoom North) ElevatorRoom2 South)
         else do
             putStrLn "Wrong code."

@@ -1,18 +1,18 @@
 module Texts where
 
-wakeUp = "You wake up in a dark room."
+wakeUp = "You wake up, finding yourself lying down on a pink pillow in a slightly lit up\nroom. Every wall contains a door with a sign next to it. From the ceiling a\nlarge metal pipe with some blood on it is hanging down. Trying to stand up you\nnotice a small device falling of you. [:? for help]"
 
-help = "Me helping you."
+help = "Help page:\n :save (:s)             -- Save game\n :quit (:q)/ :exit (:e) -- Leave game\n :help (:h/ :?)         -- Show this help page\n go [north, east, south, west, up, down] ([n, e, s, w, u, d]) -- Move around\n jump down (j)          -- Jump through holes\n look around (l)        -- Inspect your envoirement\n examine (x)            -- Examine yourself\n take {Item}            -- Take up an item from your envoirement\n drop {Item}            -- Drop an item from your inventory\n push {Object}          -- Move an object out of your way\n use {Item}             -- Use an item from your inventory\n open {Object}          -- Try to open an object\n put {Item} in {Obejct} -- Interact with an object using an item"
 
 pushedShelf = "You pushed the shelf revealing a small hole leading to the a dark room\nbelow you."
 
-rigthLockerCode = "The locker displays shows you the words \"Right Code\" while\na Long Field Communication Module falls out of it."
+rightLockerCode = "The locker displays shows you the words \"Right Code\" while\na Long Field Communication Module falls out of it."
+righttRoomCode  = "Transmission Room Door opened."
 
-tRoomDoorOpen = "Transmission Room Door opened."
+gameOver = "You died. Press Enter"
+gameWon = "You won. Press Enter"
 
-wonGame = "You won. Press Enter"
-
-enteringCave = "Welcome in the cave."
+enteringCave = "You moved through the leck in the hull and got into a small passageway.\nVenturing deeper into the cave ~~~~~~"
 
 foundDeadBody = "You found a dead body. On his arm is a code: \"4546B\"."
 
@@ -71,5 +71,5 @@ itemText i
     | i == 0 = "Chiefs ID TEXT"
     | i == 1 = "Long Field Communication Module (LFCM) TEXT"
     | i == 2 = "Universal Compression Unit (UCU) TEXT"
-    | i == 3 = "\"HELLO HO\""
+    | i == 3 = "\"HELLO im away\""
     | otherwise = "Error"
