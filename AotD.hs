@@ -1,5 +1,6 @@
-module GameTest where
+module AotD where
 import Control.Exception
+import Control.Monad
 import System.IO
 import System.Directory
 import Data.Char
@@ -22,6 +23,7 @@ type DoorStatus  = (Location, Bool)
 type MapState    = Map.Map Location RoomData
 type PlayerState = (PlayerData, Location)
 type GameState   = (String, (MapState, PlayerState))
+type Coords      = (Integer, Integer)
 
 -- ### Main Loops ###
 
@@ -36,11 +38,10 @@ main' = do
                      filePath <- getLine
                      readFile filePath
                  else do -- User wants to start a new game
-                     name <- Intro.playIntro
+                     --name <- Intro.playIntro
+                     let name = "Debugger"
                      return $ show ((Texts.wakeUp, (initialmS, initialpS name)), randomDungeon))
-    let (gameState, dungeon) = read game :: (GameState, ([((Integer, Integer), Dungeon.Room)], (Integer, Integer)))
-    --Dungeon.printDungeon $ fst dungeon       -- <- Debugging
-    --putStrLn . show $ snd dungeon            -- <- Debugging
+    let (gameState, dungeon) = read game :: (GameState, ([(Coords, Dungeon.Room)], Coords))
     Logo.printLogo
     gameLoop gameState dungeon
 
@@ -53,27 +54,26 @@ gameLoop (msg, (mapState, playerState)) dungeon = do
     putStr "\n> "
     input <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
     let newGameState = newState input (mapState', playerState)
-    if (gameOver $ fst playerState) == 1
-        then endGame "GameOver"
-        else if (gameOver $ fst playerState) == 2
-                 then endGame "YouWon"
-                 else if quitChars input
-                          then endGame "UserQuit"
-                          else if saveChars input
-                                   then do
-                                       putStr "Save File: "
-                                       filePath <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
-                                       writeFile filePath (show ((msg, (mapState, playerState)), dungeon))
-                                       gameLoop ("Saved.\n" ++ msg, snd newGameState) dungeon
-                                   else gameLoop newGameState dungeon
-
-endGame a = putStrLn $ "\n\n" ++ a
+    testEnvironmentalChars input newGameState dungeon msg
 
 -- ### Interaction ###
 
+testEnvironmentalChars input gS dungeon oldmsg
+    | (gameOver . fst . snd $ snd gS) == 1 = endGame Texts.gameOver
+    | (gameOver . fst . snd $ snd gS) == 2 = endGame Texts.gameWon
+    | quitChars input = do
+        putStrLn "Do you want to save before you quit? y/n"
+        saveQ <- getLine
+        when (saveQ == "y") (saveGame ((oldmsg, snd gS), dungeon))
+        endGame "UserQuit"
+    | saveChars input = do
+        saveGame ((oldmsg, snd gS), dungeon)
+        gameLoop ((fst gS) ++ oldmsg, snd gS) dungeon
+    | otherwise = gameLoop gS dungeon
+
 newState :: String -> (MapState, PlayerState) -> GameState
 newState input (mS, pS)
-    | saveChars input = ("Saved.", (mS, pS))
+    | saveChars input = ("Saved.\n\n", (mS, pS))
     | moveChars input = move input (mS, pS)
     | elevChars input = elev input (mS, pS)
     | lookChars input = lookAround (mS, pS)
@@ -198,7 +198,7 @@ putIn input (mS, pS)
     | elem input ["lfcm in transmission tower", "lfcm in tower", "long field communication module in transmission tower", "long field communication module in tower"] =
         if snd pS == TransmissionRoom
             then (if elem LFCM (getInventory pS)
-                      then (Texts.wonGame, (mS, (PlayerData {inventory = getInventory pS, health = health $ fst pS, maxHealth = maxHealth $ fst pS, movesTilWaterDeath = movesTilWaterDeath $ fst pS, movesTilReactorDeath = movesTilReactorDeath $ fst pS, getName = getName $ fst pS, gameOver = 2}, snd pS)))
+                      then (Texts.gameWon, (mS, (PlayerData {inventory = getInventory pS, health = health $ fst pS, maxHealth = maxHealth $ fst pS, movesTilWaterDeath = movesTilWaterDeath $ fst pS, movesTilReactorDeath = movesTilReactorDeath $ fst pS, getName = getName $ fst pS, gameOver = 2}, snd pS)))
                       else ("You have no Long Field Communication Module in your inventory.", (mS, pS)))
             else ("You aren't in the rigth room.", (mS, pS))
     | otherwise = ("What are you trying to accomplish with that?", (mS, pS))
@@ -238,7 +238,7 @@ testCode mS "Input security door code:" = do
         else do
             putStrLn "Wrong code."
             return mS
-testCode mS msg = return mS
+testCode mS _ = return mS
 
 -- ### Help Functions ###
 
@@ -308,11 +308,18 @@ isort xs = foldr (\x acc -> insert x acc) [] xs
 handler :: IOError -> IO ()
 handler error = putStrLn "File does not exist."
 
+endGame a = putStrLn $ "\n\n" ++ a
+
+saveGame game = do
+    putStr "Save File: "
+    filePath <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
+    writeFile filePath (show game)
+
 -- ### Input Categories ###
 
 saveChars input = elem input [":s", ":save"]
-quitChars input = elem input [":q", ":l", ":e", ":quit", ":leave", ":exit"]
 helpChars input = elem input [":?", ":h", ":help"]
+quitChars input = elem input [":q", ":l", ":e", ":quit", ":leave", ":exit"]
 moveChars input = elem input ["n", "e", "s", "w", "go north", "go east", "go south", "go west"]
 elevChars input = elem input ["u", "d", "go up", "go down", "j", "jump", "jump down"]
 lookChars input = elem input ["l", "look around"]
@@ -352,11 +359,11 @@ initialmS = Map.fromList -- GameMap
      (PanoramaRoomE,    RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Empty, False)),           (South, (Empty, False)),            (West, (ElevatorRoom1, True))],    items = [], actions = [JumpDown ChiefsRoom False]}),
      (Floor1N,          RoomData {directions = Map.fromList [(North, (ElevatorRoom1, True)),  (East, (Empty, False)),           (South, (Floor1S, True)),           (West, (Empty, False))],           items = [], actions = []}),
      (StockRoom,        RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Floor1S, False)),         (South, (Empty, False)),            (West, (Empty, False))],           items = [], actions = []}),
-     (Floor1S,          RoomData {directions = Map.fromList [(North, (Floor1N, True)),        (East, (Floor1E, True)),          (South, (Empty, False)),            (West, (StockRoom, False))],       items = [], actions = []}),
+     (Floor1S,          RoomData {directions = Map.fromList [(North, (Floor1N, True)),        (East, (Floor1E, False)),         (South, (Empty, False)),            (West, (StockRoom, False))],       items = [], actions = []}),
      (Floor1E,          RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Cave, True)),             (South, (Empty, False)),            (West, (Floor1S, True))],         items = [], actions = [JumpDown SnakeFarm True]}),
      (ElevatorRoom2,    RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Empty, False)),           (South, (TransmissionRoom, False)), (West, (Empty, False))],           items = [], actions = [ElevDown ElevatorRoom1]}),
      (TransmissionRoom, RoomData {directions = Map.fromList [(North, (ElevatorRoom2, False)), (East, (Empty, False)),           (South, (Empty, False)),            (West, (Empty, False))],           items = [], actions = []})]
-initialpS name = (PlayerData {inventory = [], health = 20, maxHealth = 20, movesTilWaterDeath = -1, movesTilReactorDeath = -1, getName = name, gameOver = 0}, Floor0)
+initialpS name = (PlayerData {inventory = [ChiefsID], health = 20, maxHealth = 20, movesTilWaterDeath = -1, movesTilReactorDeath = -1, getName = name, gameOver = 0}, Floor0)
 
 
 

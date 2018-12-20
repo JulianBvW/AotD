@@ -60,9 +60,9 @@ printLogo = do
     putStrLn "     | |_  |_   _| / __|     |   \\ (_)((_) ((_)((_)_)((_)(_))   ((_) )(_)) "
     putStrLn "     | __|_  | | _ \\__ \\ _   | |) || |(_-</ _|/ _ \\\\ V / / -_) | '_|| || | "
     putStrLn "     |_| (_) |_|(_)|___/(_)  |___/ |_|/__/\\__|\\___/ \\_/  \\___| |_|   \\_, | "
-    putStrLn "                                                                     |__/  \n\n\n\n"
+    putStrLn "                                                                     |__/  \n"
 
 -- ### Help Functions ###
 
 clearScreen = putStr "\ESC[2J"
-wait a = threadDelay $ a * 100000
+wait a = threadDelay $ a * 1--00000

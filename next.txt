@@ -1,10 +1,14 @@
 Further Initialization:
 - monsters + combat system
+- More items
+- Crafting (+ compression, incubation)
 
 Advanced IO:
 - Attack functions
+- Crafting (+ compression, incubation)
 
 Anytime Additions:
 - mapState + water level
 - Better writing
 - Storytelling
+  -> TerminalRoom

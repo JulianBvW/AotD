@@ -14,14 +14,14 @@ type Dungeon    = [(Coords, Room)]
 -- ### Main FUnctions ###
 
 dungeonLoop ((msg, player), (dungeon, goal)) = do
-    --printDungeon dungeon                         -- <- Debugging
+    printDungeon dungeon                         -- <- Debugging
     --putStrLn $ "P: " ++ (show player)            -- <- Debugging
     --putStrLn $ "G: " ++ (show goal)              -- <- Debugging
     putStrLn $ msg
     if player == goal
         then putStrLn Texts.foundDeadBody
         else return ()
-    putStr $ "You can go:" ++ (foldl (\acc x -> acc ++ " " ++ (show x)) "" (isort $ getDirections dungeon player)) ++ "\n\n> "
+    putStr $ "Possible ways:" ++ (foldl (\acc x -> acc ++ " " ++ (show x)) "" (isort $ getDirections dungeon player)) ++ "\n\n> "
     input <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
     let newState = calcInput input dungeon goal player
     if snd (fst newState) == (0, -1)
@@ -42,7 +42,7 @@ generate = do
     return (dungeon, maxCoord dungeon)
 
 genDungeon :: [(Coords, Room)] -> RandomInts -> [(Coords, Room)] -- gen=generate
-genDungeon _ [] = error "Dafuq"
+genDungeon _ [] = error "Too few random numbers. Please restart."
 genDungeon l (r:rs) = let cRooms (_, room) = case room of NRoom _ -> False
                                                           CRoom _ _ -> True
     in if null (filter cRooms l) then l else genDungeon (genLayer l r) rs
@@ -91,8 +91,8 @@ randDirs dir r = filter (/=dir) newDirs
               | mod r 19 == 14 = [N,E,S,W]
               | otherwise      = [E,S,W]
 
-boundx = 4--4
-boundy = 6--6
+boundx = 3--4
+boundy = 4--6
 
 -- ### Help Functions ###
 
@@ -113,7 +113,10 @@ printDungeon xs = do
 
 comb [a,b,c] [d,e,f] = [a++d,b++e,c++f]
 
-printr room = if room /= Nothing then [h ++ (isF N room) ++ h, (isF W room) ++ s ++ (isF E room), h ++ (isF S room) ++ h] else [qq ++ qq ++ qq, qq ++ qq ++ qq, qq ++ qq ++ qq]
+printr room = if room /= Nothing then [h ++ (isF N room) ++ h,
+                                       (isF W room) ++ s ++ (isF E room),
+                                       h ++ (isF S room) ++ h]
+                                 else [qq ++ qq ++ qq, qq ++ qq ++ qq, qq ++ qq ++ qq]
     where (h, s, qq) = ("# ", "  ", "  ")
 
 isF r room = if elem r (directions room) then "  " else "# "
