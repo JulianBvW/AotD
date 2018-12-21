@@ -16,7 +16,10 @@ mainD = do
     gameLoop (b, i)
 
 handler :: IOError -> IO ()
-handler e = putStrLn "Whoops, had some trouble!"
+handler e = do
+    putStrLn "Whoops, had some trouble!"
+    catch mainD handler
+    putStrLn "Lol"
 
 gameLoop (b, i) = do
     putStrLn $ show (b, i)

@@ -10,6 +10,7 @@ import qualified Intro as Intro
 import qualified Texts as Texts
 import qualified Logo as Logo
 import qualified Menu as Menu
+import qualified Terminal as Terminal
 import qualified RandomDungeon as Dungeon
 
 data Direction   = North | East | South | West deriving (Show, Eq, Ord, Read)
@@ -27,19 +28,14 @@ type Coords      = (Integer, Integer)
 
 -- ### Main Loops ###
 
-main = catch main' handler
-
-main' = do
-    choice <- Menu.loop -- Asks user: New Game or Load Game
+main = do
+    choice <- Menu.loop                      -- Asks user: New Game or Load Game
     randomDungeon <- Dungeon.generate
     game <- (if choice == "2" 
-                 then do -- User wants to load a gamefile
-                     putStr "Save file name: "
-                     filePath <- getLine
-                     readFile filePath
-                 else do -- User wants to start a new game
-                     --name <- Intro.playIntro
-                     let name = "Debugger"
+                 then do                     -- User wants to load a gamefile
+                     catch loadGame loadHandler
+                 else do                     -- User wants to start a new game
+                     name <- Intro.playIntro
                      return $ show ((Texts.wakeUp, (initialmS, initialpS name)), randomDungeon))
     let (gameState, dungeon) = read game :: (GameState, ([(Coords, Dungeon.Room)], Coords))
     Logo.printLogo
@@ -48,7 +44,10 @@ main' = do
 gameLoop (msg, (mapState, playerState)) dungeon = do
     putStrLn msg
     if msg == Texts.enteringCave
-        then Dungeon.dungeonLoop (("You cannot save. You cannot quit. You can only move.", (0, 0)), dungeon)
+        then Dungeon.dungeonLoop (("***You cannot save. You cannot quit. You can only move.", (0, 0)), dungeon)
+        else return ()
+    if msg == "Accessed terminal."
+        then Terminal.terminalLoop
         else return ()
     mapState' <- testCode mapState msg
     putStr "\n> "
@@ -64,28 +63,30 @@ testEnvironmentalChars input gS dungeon oldmsg
     | quitChars input = do
         putStrLn "Do you want to save before you quit? y/n"
         saveQ <- getLine
-        when (saveQ == "y") (saveGame ((oldmsg, snd gS), dungeon))
+        when (saveQ == "y") (catch (saveGame (("\n\n\n" ++ oldmsg, snd gS), dungeon)) (saveHandler (("\n\n\n" ++ oldmsg, snd gS), dungeon)))
         endGame "UserQuit"
     | saveChars input = do
-        saveGame ((oldmsg, snd gS), dungeon)
+        catch (saveGame (("\n\n\n" ++ oldmsg, snd gS), dungeon)) (saveHandler (("\n\n\n" ++ oldmsg, snd gS), dungeon))
         gameLoop ((fst gS) ++ oldmsg, snd gS) dungeon
     | otherwise = gameLoop gS dungeon
 
 newState :: String -> (MapState, PlayerState) -> GameState
 newState input (mS, pS)
     | saveChars input = ("Saved.\n\n", (mS, pS))
-    | moveChars input = move input (mS, pS)
-    | elevChars input = elev input (mS, pS)
-    | lookChars input = lookAround (mS, pS)
-    | helpChars input = printHelp  (mS, pS)
-    | examChars input = examine    (mS, pS)
-    | takeChars input = takeItem   (unwords . tail $ words input) (mS, pS)
-    | dropChars input = dropItem   (unwords . tail $ words input) (mS, pS)
-    | pushChars input = push       (unwords . tail $ words input) (mS, pS)
-    | useChars  input = useItem    (unwords . tail $ words input) (mS, pS)
-    | openChars input = openLocker (unwords . tail $ words input) (mS, pS)
-    | putChars  input = putIn      (unwords . tail $ words input) (mS, pS)
-    | otherwise       = ("You wait. Nothing happened.", (mS, pS))
+    | moveChars input = move input  (mS, pS)
+    | elevChars input = elev input  (mS, pS)
+    | lookChars input = lookAround  (mS, pS)
+    | helpChars input = printHelp   (mS, pS)
+    | examChars input = examine     (mS, pS)
+    | takeChars input = takeItem    (unwords . tail $ words input) (mS, pS)
+    | dropChars input = dropItem    (unwords . tail $ words input) (mS, pS)
+    | pushChars input = push        (unwords . tail $ words input) (mS, pS)
+    | inspChars input = useItem     (unwords . tail $ words input) (mS, pS)
+    | openChars input = openLocker  (unwords . tail $ words input) (mS, pS)
+    | putChars  input = putIn       (unwords . tail $ words input) (mS, pS)
+    | useChars  input = useTerminal (unwords . tail $ words input) (mS, pS)
+    | null input      = ("You wait. Nothing happened.", (mS, pS))
+    | otherwise       = ("I don't understand.", (mS, pS))
 
 printHelp :: (MapState, PlayerState) -> GameState
 printHelp (mS, pS) = (Texts.help, (mS, pS))
@@ -184,7 +185,7 @@ useItem itemInput gS
     | otherwise                                                  = ("There is no " ++ itemInput ++ " to use.", gS)
 
 openLocker :: String -> (MapState, PlayerState) -> GameState
-openLocker lockernr (mS, pS) = if snd pS == StockRoom then openLocker' lockernr else ("There are no lockers", (mS, pS))
+openLocker lockernr (mS, pS) = if snd pS == StockRoom then openLocker' lockernr else ("There is no " ++ lockernr ++ " to open.", (mS, pS))
     where openLocker' lockernr
               | elem lockernr ["", "locker"] = ("Which locker do you want to open?", (mS, pS))
               | elem lockernr ["first locker", "locker 1"]  = ("Input locker code (lockernr. I):", (mS, pS))
@@ -202,6 +203,13 @@ putIn input (mS, pS)
                       else ("You have no Long Field Communication Module in your inventory.", (mS, pS)))
             else ("You aren't in the rigth room.", (mS, pS))
     | otherwise = ("What are you trying to accomplish with that?", (mS, pS))
+
+useTerminal :: String -> (MapState, PlayerState) -> GameState
+useTerminal input (mS, pS) = if snd pS == TerminalRoom then useTerminal' input else ("There is no " ++ input ++ " to use.", (mS, pS))
+    where useTerminal' input
+              | elem input ["", "locker"] = ("Use what?", (mS, pS))
+              | elem input ["terminal"]   = ("Accessed terminal.", (mS, pS))
+              | otherwise                 = ("I don't understand.", (mS, pS))
 
 testCode mS "Input locker code (lockernr. I):" = do
     putStr "\n>>> "
@@ -239,6 +247,16 @@ testCode mS "Input security door code:" = do
             putStrLn "Wrong code."
             return mS
 testCode mS _ = return mS
+
+loadGame = do
+    putStr "Save file name: "
+    filePath <- getLine
+    readFile filePath
+
+saveGame game = do
+    putStr "Save File: "
+    filePath <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
+    writeFile filePath (show game)
 
 -- ### Help Functions ###
 
@@ -305,15 +323,18 @@ isort xs = foldr (\x acc -> insert x acc) [] xs
               | x <= y    = x:y:xs
               | otherwise = y:(insert x xs)
 
-handler :: IOError -> IO ()
-handler error = putStrLn "File does not exist."
+loadHandler :: IOError -> IO String
+loadHandler error = do
+    putStrLn "File does not exist."
+    catch loadGame loadHandler
+
+saveHandler :: (GameState, ([(Coords, Dungeon.Room)], Coords)) -> IOError -> IO ()
+saveHandler game error = do
+    putStrLn "Input file name."
+    catch (saveGame game) (saveHandler game)
+    putStr "..."
 
 endGame a = putStrLn $ "\n\n" ++ a
-
-saveGame game = do
-    putStr "Save File: "
-    filePath <- (getLine >>= (\x -> return (map toLower . unwords $ words x)))
-    writeFile filePath (show game)
 
 -- ### Input Categories ###
 
@@ -324,6 +345,9 @@ moveChars input = elem input ["n", "e", "s", "w", "go north", "go east", "go sou
 elevChars input = elem input ["u", "d", "go up", "go down", "j", "jump", "jump down"]
 lookChars input = elem input ["l", "look around"]
 examChars input = elem input ["x", "examine me"]
+useChars input
+    | null input = False
+    | otherwise  = elem (head $ words input) ["use"]
 takeChars input
     | null input = False
     | otherwise  = elem (head $ words input) ["take"]
@@ -333,9 +357,9 @@ dropChars input
 pushChars input
     | null input = False
     | otherwise  = elem (head $ words input) ["push"]
-useChars input
+inspChars input
     | null input = False
-    | otherwise  = elem (head $ words input) ["use"]
+    | otherwise  = elem (head $ words input) ["inspect"]
 openChars input
     | null input = False
     | otherwise  = elem (head $ words input) ["open"]
@@ -360,7 +384,7 @@ initialmS = Map.fromList -- GameMap
      (Floor1N,          RoomData {directions = Map.fromList [(North, (ElevatorRoom1, True)),  (East, (Empty, False)),           (South, (Floor1S, True)),           (West, (Empty, False))],           items = [], actions = []}),
      (StockRoom,        RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Floor1S, False)),         (South, (Empty, False)),            (West, (Empty, False))],           items = [], actions = []}),
      (Floor1S,          RoomData {directions = Map.fromList [(North, (Floor1N, True)),        (East, (Floor1E, False)),         (South, (Empty, False)),            (West, (StockRoom, False))],       items = [], actions = []}),
-     (Floor1E,          RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Cave, True)),             (South, (Empty, False)),            (West, (Floor1S, True))],         items = [], actions = [JumpDown SnakeFarm True]}),
+     (Floor1E,          RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Cave, True)),             (South, (Empty, False)),            (West, (Floor1S, True))],          items = [], actions = [JumpDown SnakeFarm True]}),
      (ElevatorRoom2,    RoomData {directions = Map.fromList [(North, (Empty, False)),         (East, (Empty, False)),           (South, (TransmissionRoom, False)), (West, (Empty, False))],           items = [], actions = [ElevDown ElevatorRoom1]}),
      (TransmissionRoom, RoomData {directions = Map.fromList [(North, (ElevatorRoom2, False)), (East, (Empty, False)),           (South, (Empty, False)),            (West, (Empty, False))],           items = [], actions = []})]
 initialpS name = (PlayerData {inventory = [ChiefsID], health = 20, maxHealth = 20, movesTilWaterDeath = -1, movesTilReactorDeath = -1, getName = name, gameOver = 0}, Floor0)
