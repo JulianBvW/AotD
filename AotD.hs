@@ -47,7 +47,7 @@ gameLoop (msg, (mapState, playerState)) dungeon = do
         then Dungeon.dungeonLoop (("***You cannot save. You cannot quit. You can only move.", (0, 0)), dungeon)
         else return ()
     if msg == "Accessed terminal."
-        then Terminal.terminalLoop
+        then Terminal.terminalLoop (map toLower . getName $ fst playerState) ""
         else return ()
     mapState' <- testCode mapState msg
     putStr "\n> "
