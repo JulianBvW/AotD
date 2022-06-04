@@ -40,11 +40,11 @@ getCAT input path
     | otherwise = "bash: cat: " ++ input ++ ": File not found or corrupted.\n"
 
 folders = ["public", "crash-logs", "fts"]
-files   = ["logo.txt", "militarylaunch.tdoc", "research.tdoc", "gmarek-tribute.tdoc", "current-0002.log"]
+files   = ["logo.txt", "militarylaunch.tdoc", "militarylaunch-comment17.tdoc", "interview.tdoc", "research3.tdoc", "gmarek-tribute.tdoc", "current-0002.log"]
 content = [("", "\ESC[36m public    private    crash-logs \ESC[37m"),
-           ("/public", "\ESC[36m fts \ESC[37m      research.tdoc       gmarek-tribute.tdoc"),
+           ("/public", "\ESC[36m fts \ESC[37m      research3.tdoc       gmarek-tribute.tdoc     interview.tdoc"),
            ("/crash-logs", "\ESC[36m logs-old \ESC[37m current-0002.log"),
-           ("/public/fts", " logo.txt  militarylaunch.tdoc")]
+           ("/public/fts", " logo.txt  militarylaunch.tdoc  militarylaunch-comment17.tdoc")]
 
 cdChars  input = elem (head $ words input) ["cd"]
 catChars input = elem (head $ words input) ["cat", "more"]
@@ -55,8 +55,10 @@ quitChars = ["leave", "exit", "quit"]
 --    FTS
 --        logo.txt
 --        militaryLaunch.tdoc
---    research.tdoc
+--        militaryLaunch-commant17.tdoc
+--    research3.tdoc
 --    gmarek-tribute.tdoc
+--    interview.tdoc
 --private §-> bash: cd: private: Access denied.
 --crash-logs
 --    current-0002.tdoc
