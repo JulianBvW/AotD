@@ -63,7 +63,7 @@ terminalFile file
         ++ "                      |  best that they come back with valuable results.\n"
         ++ " Terran-Document      |\n"
         ++ " Reader v3.14         |                     - sTech CEO Holro Garill\n\n"
-    | file == "gmarek-tribute.tdoc" = 
+    | file == "alsiem-tribute.tdoc" = 
         "\n"
         ++ "      Aurelius Ly Siem - Engineer, politician, fleet commander\n"
         ++ " ______________________________________________________________________________\n"
@@ -364,7 +364,7 @@ itemText i
     | i ==  7 = "This device allows you to condensate the water in the air\narround you to then shoot it in the direction you want."
     | i ==  8 = "If you put this small ball in an object it will automatically\nscan its surrounding to analyse its parts."
     | i ==  9 = "Scrap metal is used for many recipes in the fabricator."
-    | i == 10 = "The data on this identification card reveals some information about the\ncaptain. Her full name is Ariana Celine Marek and she is the president of the\nFederation of Terran Systems."
+    | i == 10 = "The data on this identification card reveals some information about the\ncaptain. Her full name is Lila Celine Marek and she is the vice president of the\nFederation of Terran Systems."
     | i == 11 = "The data on this identification card reveals some information about Palak\nAlviin. He is the second president of the Alviin Septem family, seventh seat on\nthe Council of the Novan Family Clans."
     | i == 12 = "This MediKit will help you regain HP.\nUsage: Type MediKit"
     | otherwise = "Error"
