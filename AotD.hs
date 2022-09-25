@@ -58,7 +58,7 @@ gameLoop (msg, (mapState, playerState)) dungeon = do
 -- ### Interaction ###
 
 testEnvironmentalChars input gS dungeon oldmsg
-    | (gameOver . fst . snd $ snd gS) == 1 = endGame Texts.gameOver
+    | (gameOver . fst . snd $ snd gS) == 1 = endGame Texts.gameOverSnake
     | (gameOver . fst . snd $ snd gS) == 2 = endGame Texts.gameWon
     | quitChars input = do
         putStrLn "Do you want to save before you quit? y/n"
